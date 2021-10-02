@@ -10,7 +10,9 @@
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^8.6.0",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "mongodb": "^4.1.2",
+    "mongoose": "^6.0.8"
   },
   "repository": {
     "url": "git+https://github.com/freeCodeCamp/boilerplate-project-exercisetracker.git"
@@ -24,6 +26,5 @@
     "url": "https://github.com/freeCodeCamp/boilerplate-project-exercisetracker/issues"
   },
   "homepage": "https://github.com/freeCodeCamp/boilerplate-project-exercisetracker#readme",
-  "author": "Atul Mandavkar",
-  "devDependencies": {}
+  "author": "Atul Mandavkar"
 }

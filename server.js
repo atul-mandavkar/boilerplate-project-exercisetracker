@@ -9,7 +9,18 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
 
-let usernameInput;
+// To connect to mongodb via mongoose
+const mongoose = require("mongoose");
+const {Schema} = require("mongoose");
+mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true });
+const UserSchema = new Schema({
+  username: {type: String, require: true},
+  _id: Number
+});
+const User = mongoose.model("User", UserSchema);
+let UserNew;
+
+let usernameInput, idInput;
 
 // pOST TO /api/users with form data username to create new user
 const bodyParser = require("body-parser");
@@ -17,7 +28,23 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: false}));
 app.post("/api/users", (req, res)=>{
   usernameInput = req.body.username;
-  res.end();
+
+// The response from post is an object with username and _id . For automatically getting id we used mongodb database
+  UserNew = new User({
+    username: usernameInput
+  });
+  //UserNew.save();
+  User.find({name: usernameInput}, (err, data)=>{
+    if(err){
+      console.log(err);
+    }
+    else{
+      idInput = data[data.length - 1]._id;
+      console.log(data);
+      console.log(idInput);
+    }
+  });
+  res.json({username: usernameInput, _id: idInput});
 });
 
 
