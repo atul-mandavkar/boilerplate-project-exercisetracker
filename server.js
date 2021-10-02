@@ -9,7 +9,16 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
 
+let usernameInput;
 
+// pOST TO /api/users with form data username to create new user
+const bodyParser = require("body-parser");
+// As we need name from input after posting
+app.use(bodyParser.urlencoded({extended: false}));
+app.post("/api/users", (req, res)=>{
+  usernameInput = req.body.username;
+  res.end();
+});
 
 
 
