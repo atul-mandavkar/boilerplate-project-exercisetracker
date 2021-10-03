@@ -68,7 +68,17 @@ app.post("/api/users", (req, res)=>{
   }
 });
 
-// The return response from post is object with username and _id
+// The get request to /api/users returned all users in array of object with username and _id
+app.get("/api/users", (req, res)=>{
+  User.find({_id: {$gte: 0}}, (err, data)=>{
+    if(err){
+      console.log(err);
+    }
+    else{
+      res.send(data);
+    }
+  });
+});
 
 
 const listener = app.listen(process.env.PORT || 3000, () => {
