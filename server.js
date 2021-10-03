@@ -14,8 +14,8 @@ const mongoose = require("mongoose");
 const {Schema} = require("mongoose");
 mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true });
 const UserSchema = new Schema({
-  username: {type: String, require: true},
-  _id: Number
+  _id: Number,
+  username: {type: String, require: true}
 });
 const User = mongoose.model("User", UserSchema);
 let UserNew;
@@ -26,27 +26,49 @@ let usernameInput, idInput;
 const bodyParser = require("body-parser");
 // As we need name from input after posting
 app.use(bodyParser.urlencoded({extended: false}));
+// The response from post is an object with username and _id . For automatically getting id we used mongodb database
 app.post("/api/users", (req, res)=>{
   usernameInput = req.body.username;
-
-// The response from post is an object with username and _id . For automatically getting id we used mongodb database
-  UserNew = new User({
-    username: usernameInput
-  });
-  //UserNew.save();
-  User.find({name: usernameInput}, (err, data)=>{
-    if(err){
-      console.log(err);
-    }
-    else{
-      idInput = data[data.length - 1]._id;
-      console.log(data);
-      console.log(idInput);
-    }
-  });
-  res.json({username: usernameInput, _id: idInput});
+  // if to check whether input is not blank
+  if(usernameInput != ""){
+    // To get exact id before saving database
+    User.find({_id: {$gte: 0}}, (err, data)=>{
+      if(err){
+        console.log(err);
+      }
+      else{
+        // if there is data
+        if(data.length > 0){
+          idInput = data[data.length - 1]._id + 1;
+          UserNew = new User({
+            _id: idInput,
+            username: usernameInput
+          });
+          UserNew.save();
+          // To return response form post
+          res.json({username: usernameInput, _id: idInput});
+        }
+        // if no data
+        else{
+          idInput = 1;
+          UserNew = new User({
+            _id: idInput,
+            username: usernameInput
+          });
+          UserNew.save();
+          // To return response from post
+          res.json({username: usernameInput, _id: idInput});
+        }
+      }
+    });
+  }
+  // if input is blank
+  else{
+    res.send("path \'username\' is required")
+  }
 });
 
+// The return response from post is object with username and _id
 
 
 const listener = app.listen(process.env.PORT || 3000, () => {
