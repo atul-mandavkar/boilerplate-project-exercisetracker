@@ -21,7 +21,7 @@ UserSchema.set("toObject", {getters: true});
 const User = mongoose.model("User", UserSchema);
 let UserNew;
 
-let usernameInput, idInput;
+let usernameInput, idInput, descriptionInput, durationInput, dateInput;
 
 // pOST TO /api/users with form data username to create new user
 const bodyParser = require("body-parser");
@@ -58,6 +58,20 @@ app.get("/api/users", (req, res)=>{
     }
   })
 });
+
+// To post to /api/users/:_id/exercises . the input from exerceise form and if date is not supplied then use current date
+app.post("/api/users/:_id/exercises", (req, res)=>{
+  descriptionInput = req.body.description;
+  durationInput = req.body.duration;
+  let d = (req.body.date)?(new Date(req.body.date)):(new Date());
+  dateInput = (d.toDateString());
+  idInput = req.params._id;
+  console.log("id is " + idInput);
+  console.log("description is " + descriptionInput);
+  console.log("duration is " + durationInput);
+  console.log("date is " + dateInput);
+  res.end();
+})
 
 
 const listener = app.listen(process.env.PORT || 3000, () => {
