@@ -14,9 +14,10 @@ const mongoose = require("mongoose");
 const {Schema} = require("mongoose");
 mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true });
 const UserSchema = new Schema({
-  _id: Number,
   username: {type: String, require: true}
 });
+// To convert object into string literal use toObject whith getter:true at schema level So that you will get only string part of id not new Object(string part)
+UserSchema.set("toObject", {getters: true});
 const User = mongoose.model("User", UserSchema);
 let UserNew;
 
@@ -31,36 +32,13 @@ app.post("/api/users", (req, res)=>{
   usernameInput = req.body.username;
   // if to check whether input is not blank
   if(usernameInput != ""){
-    // To get exact id before saving database
-    User.find({_id: {$gte: 0}}, (err, data)=>{
-      if(err){
-        console.log(err);
-      }
-      else{
-        // if there is data
-        if(data.length > 0){
-          idInput = data[data.length - 1]._id + 1;
-          UserNew = new User({
-            _id: idInput,
-            username: usernameInput
-          });
-          UserNew.save();
-          // To return response form post
-          res.json({username: usernameInput, _id: idInput});
-        }
-        // if no data
-        else{
-          idInput = 1;
-          UserNew = new User({
-            _id: idInput,
-            username: usernameInput
-          });
-          UserNew.save();
-          // To return response from post
-          res.json({username: usernameInput, _id: idInput});
-        }
-      }
+    UserNew = new User({
+      username: usernameInput
     });
+    UserNew.save();
+
+    // To get return response from post
+    res.json({username: UserNew.username, _id: UserNew.id});
   }
   // if input is blank
   else{
@@ -70,14 +48,15 @@ app.post("/api/users", (req, res)=>{
 
 // The get request to /api/users returned all users in array of object with username and _id
 app.get("/api/users", (req, res)=>{
-  User.find({_id: {$gte: 0}}, (err, data)=>{
+  // To get all entries use chain method of module
+  User.find().all().exec((err, data)=>{
     if(err){
       console.log(err);
     }
     else{
       res.send(data);
     }
-  });
+  })
 });
 
 
