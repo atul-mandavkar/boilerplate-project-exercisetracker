@@ -59,6 +59,15 @@ app.get("/api/users", (req, res)=>{
   })
 });
 
+// For exercise form we have to make new module and it's casting
+const exerciseSchema = new Schema({
+  id: {type: String, require: true},
+  username: String,
+  date: String,
+  duration: Number,
+  description: String
+});
+
 // To post to /api/users/:_id/exercises . the input from exerceise form and if date is not supplied then use current date
 app.post("/api/users/:_id/exercises", (req, res)=>{
   descriptionInput = req.body.description;
@@ -70,6 +79,9 @@ app.post("/api/users/:_id/exercises", (req, res)=>{
   console.log("description is " + descriptionInput);
   console.log("duration is " + durationInput);
   console.log("date is " + dateInput);
+
+
+  // To get response from the post
   res.end();
 })
 
