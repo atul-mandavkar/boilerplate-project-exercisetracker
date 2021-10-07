@@ -28,7 +28,7 @@ UserSchema.set("toObject", {getters: true});
 let User = mongoose.model("User", UserSchema);
 let UserNew;
 
-let usernameInput, idInput, descriptionInput, durationInput, dateInput;
+let usernameInput, idInput, descriptionInput, durationInput, dateInput, newSetGet, fromD, toD, limitN;
 
 // pOST TO /api/users with form data username to create new user
 const bodyParser = require("body-parser");
@@ -53,7 +53,6 @@ app.post("/api/users", (req, res)=>{
   }
 });
 
-let newSetGet;
 // The get request to /api/users returned all users in array of object with username and _id
 app.get("/api/users", (req, res)=>{
   newSetGet = [];
@@ -102,7 +101,6 @@ app.post("/api/users/:_id/exercises", (req, res)=>{
 app.get("/api/users/:_id/logs", (req, res)=>{
   newSetGet = [];
   idInput = req.params._id;
-  console.log(idInput);
   User.findById({_id: idInput}, (err, data)=>{
     if(err){
       console.log(err);
@@ -115,12 +113,57 @@ app.get("/api/users/:_id/logs", (req, res)=>{
           duration: data.logs[i].duration,
           date: data.logs[i].date
         });
+        console.log(new Date(data.logs[i].date).getTime());
       }
       // Response from get request
-      res.json({_id: idInput, username: data.username, count: data.logs.length, log: newSetGet});
+      fromD = req.query.from;
+      toD = req.query.to;
+      limitN = req.query.limit;
+
+      if(fromD || toD || limitN){
+        console.log();
+        console.log(new Date(fromD).getTime());
+        console.log(new Date(toD).getTime());
+        console.log(limitN);
+        if(limitN){
+          console.log("with limit");
+          // i < limitN for newSetGet array
+          if(fromD && toD){
+
+          }
+          else if(fromD && !toD){
+
+          }
+          else if(!fromD && toD){
+
+          }
+        }
+        else{
+          console.log("without limit");
+          // i < data.length for newSetGet array
+          if(fromD && toD){
+
+          }
+          else if(fromD && !toD){
+
+          }
+          else if(!fromD && toD){
+            
+          }
+        }
+        res.send("here changes");
+      }
+      else{
+        res.json({_id: idInput, username: data.username, count: data.logs.length, log: newSetGet});
+      }
     }
   });
 });
+
+//You can add from, to and limit parameters to a GET /api/users/:_id/logs request to retrieve part of the log of any user. from and to are dates in yyyy-mm-dd format. limit is an integer of how many logs to send back.
+//app.gett("/api/users/:_id/logs?", (req, res)=>{
+
+//})
 
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
