@@ -53,9 +53,10 @@ app.post("/api/users", (req, res)=>{
   }
 });
 
-let newSetGet = [];
+let newSetGet;
 // The get request to /api/users returned all users in array of object with username and _id
 app.get("/api/users", (req, res)=>{
+  newSetGet = [];
   // To get all entries use chain method of module
   User.find().all().exec((err, data)=>{
     if(err){
@@ -68,7 +69,7 @@ app.get("/api/users", (req, res)=>{
       }
       res.send(newSetGet);
     }
-  })
+  });
 });
 
 // To post to /api/users/:_id/exercises . the input from exerceise form and if date is not supplied then use current date
@@ -92,11 +93,34 @@ app.post("/api/users/:_id/exercises", (req, res)=>{
       });
       data.save();
       // Response return from post
-      res.json({_id: idInput, username: data.username, date: data.logs[0].date, duration: data.logs[0].duration, description: data.logs[0].description});
+      res.json({_id: idInput, username: data.username, date: data.logs[data.logs.length - 1].date, duration: data.logs[data.logs.length - 1].duration, description: data.logs[data.logs.length - 1].description});
     }
   });
 });
 
+// To Get request to /api/users/:_id/logs to retrive full exercise log of user
+app.get("/api/users/:_id/logs", (req, res)=>{
+  newSetGet = [];
+  idInput = req.params._id;
+  console.log(idInput);
+  User.findById({_id: idInput}, (err, data)=>{
+    if(err){
+      console.log(err);
+      res.send("NO data");
+    }
+    else{
+      for(i = 0; i < data.logs.length; i++){
+        newSetGet.push({
+          description: data.logs[i].description,
+          duration: data.logs[i].duration,
+          date: data.logs[i].date
+        });
+      }
+      // Response from get request
+      res.json({_id: idInput, username: data.username, count: data.logs.length, log: newSetGet});
+    }
+  });
+});
 
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
